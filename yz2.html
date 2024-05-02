@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TensorFlow.js Model Kullanımı</title>
+    <!-- TensorFlow.js kütüphanesini yükle -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+</head>
+<body>
+    <h1>TensorFlow.js Model Kullanımı</h1>
+
+    <!-- Kullanıcı girişi almak için form -->
+    <form id="inputForm">
+        <label for="userInput">Kullanıcı Girişi:</label>
+        <input type="text" id="userInput" name="userInput">
+        <button type="submit">Tahmin Yap</button>
+    </form>
+
+    <!-- Tahmin sonucunu göstermek için alan -->
+    <div id="outputResult"></div>
+
+    <script>
+        // TensorFlow.js'ı kullanarak modeli yükleme
+        async function loadModelAndPredict() {
+            const modelDir = '<model_dizinini_giriniz>';
+            const model = await tf.loadLayersModel(`file://${modelDir}`);
+
+            // Form gönderildiğinde çalışacak işlev
+            const form = document.getElementById('inputForm');
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Sayfa yenilemesini önle
+
+                // Kullanıcı girişini al
+                const userInput = document.getElementById('userInput').value;
+
+                // Modeli kullanarak tahmin yap
+                const inputTensor = tf.tensor([userInput]);
+                const reshapedInput = inputTensor.reshape([1, -1]);
+                const prediction = model.predict(reshapedInput);
+                const output = tf.squeeze(prediction).arraySync();
+
+                // Tahmin sonucunu ekrana yazdır
+                const outputResult = document.getElementById('outputResult');
+                outputResult.innerHTML = `Modelin Tahmini: ${output}`;
+            });
+        }
+
+        // Sayfa yüklendiğinde modeli yükle ve form işlemlerini dinle
+        window.onload = loadModelAndPredict;
+    </script>
+</body>
+</html>
